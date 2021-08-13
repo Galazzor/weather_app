@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_app/screens/location_screen.dart';
-import 'package:weather_app/service/weather_data.dart';
+import 'package:weather_app/service/weather_service.dart';
 import 'package:weather_app/utilities/constants.dart';
+import 'package:weather_app/widgets/city_tile.dart';
 
 class CityScreen extends StatefulWidget {
   @override
@@ -10,13 +12,13 @@ class CityScreen extends StatefulWidget {
 
 class _CityScreenState extends State<CityScreen> {
   String cityName;
-  String country;
+  dynamic weatherData;
 
-  Future getLocationData(String typedCity) async {
-    dynamic tempWeatherData = await WeatherService.getCityNameAndCountry();
-    dynamic weatherData = await WeatherService.getCityData(typedCity);
-
-    country = tempWeatherData['name'];
+  Future<dynamic> getLocationData(String typedCity) async {
+    var weatherService = WeatherService();
+    var locationData =
+        await weatherService.getWeatherCity(typedCity, diff: true);
+    var weatherData = await weatherService.getOneCall(locationData);
 
     return weatherData;
   }
@@ -60,7 +62,9 @@ class _CityScreenState extends State<CityScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () {
+                onPressed: () async {
+                  weatherData = await getLocationData(cityName);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -68,8 +72,7 @@ class _CityScreenState extends State<CityScreen> {
                         if (cityName != null) {
                           return LocationScreen(
                             typedCity: cityName,
-                            country: country,
-                            weatherData: getLocationData(cityName),
+                            weatherData: weatherData,
                           );
                         } else {
                           return LocationScreen(
@@ -85,6 +88,22 @@ class _CityScreenState extends State<CityScreen> {
                   style: kButtonTextStyle,
                 ),
               ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return CityTile();
+                    },
+                    itemCount: 8,
+                  ),
+                ),
+              )
             ],
           ),
         ),

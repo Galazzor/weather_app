@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/screens/loading_screen.dart';
+import 'models/location.dart';
+import 'package:weather_app/service/location_storage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await LocationStorage.init();
+
+  List<Location> locations = <Location>[
+    Location(latitude: 45.9953, longitude: 16.95538),
+    Location(latitude: 49.9953, longitude: 26.95538)
+  ];
+
+  LocationStorage.set(locations);
+  var tempLocation = LocationStorage.get();
+
   runApp(MyApp());
 }
 
