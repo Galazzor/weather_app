@@ -14,7 +14,8 @@ void main() async {
   ];
 
   LocationStorage.set(locations);
-  var tempLocation = LocationStorage.get();
+  var temp = LocationStorage.get();
+
 
   runApp(MyApp());
 }
