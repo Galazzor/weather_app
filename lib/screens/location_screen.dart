@@ -7,40 +7,35 @@ import 'package:weather_icons/weather_icons.dart';
 import 'package:intl/intl.dart';
 
 class LocationScreen extends StatefulWidget {
-  LocationScreen({this.weatherData, this.cityData, this.typedCity});
+  LocationScreen({required this.weatherData, required this.cityData});
 
   final List<Weather> weatherData;
   final City cityData;
-  final String typedCity;
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  Weather weather;
-  int currentTemperature;
-  String currentTime;
-  String currentWeekday;
-  String currentSunrise;
-  String currentSunset;
-  String currentIcon;
-  String icon;
-  String city;
-  String country;
-  double precipitation;
+  late Weather weather;
+  late int currentTemperature;
+  late String currentTime;
+  late String currentWeekday;
+  late String currentSunrise;
+  late String currentSunset;
+  late String currentIcon;
+  late String icon;
+  late String city;
+  late String country;
+  late double precipitation;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    if (widget.typedCity == null) {
-      updateUI(widget.weatherData, cityData: widget.cityData);
-    } else {
-      updateUI(widget.weatherData, typedCity: widget.typedCity);
-    }
     widget.weatherData[0].isSelected = true;
+    updateUI(widget.weatherData, widget.cityData);
   }
 
   String calculateWeekdayToString(int epoch) {
@@ -53,27 +48,23 @@ class _LocationScreenState extends State<LocationScreen> {
     return DateFormat('jm').format(temp);
   }
 
-  void updateUI(List<Weather> weatherData, {City cityData, String typedCity}) {
+  void updateUI(List<Weather> weatherData, City cityData) {
     setState(() {
       currentIcon = weatherData[0].icon;
-      currentTemperature = weatherData[0].temperature;
+      currentTemperature = weatherData[0].temperature.toInt();
       currentWeekday = weatherData[0].weekday;
       currentTime = weatherData[0].time;
-      if (typedCity != null) {
-        this.city = typedCity;
-      } else {
-        this.city = cityData.city;
-        this.country = cityData.country;
-        this.currentSunrise = cityData.sunrise;
-        this.currentSunset = cityData.sunset;
-      }
+      this.city = cityData.city;
+      this.country = cityData.country;
+      this.currentSunrise = cityData.sunrise;
+      this.currentSunset = cityData.sunset;
     });
   }
 
   void updateFront(Weather weather) {
     setState(() {
       currentIcon = weather.icon;
-      currentTemperature = weather.temperature;
+      currentTemperature = weather.temperature.toInt();
       currentTime = weather.time;
     });
   }

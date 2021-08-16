@@ -9,11 +9,11 @@ class Weather {
   final num precipitation;
 
   Weather(
-      {this.temperature,
-      this.time,
-      this.weekday,
-      this.icon,
-      this.precipitation});
+      {required this.temperature,
+      required this.time,
+      required this.weekday,
+      required this.icon,
+      required this.precipitation});
 
   factory Weather.fromJson(Map<String, dynamic> jsonData) {
     num temp = jsonData['temp'];

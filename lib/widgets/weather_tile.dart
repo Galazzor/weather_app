@@ -9,7 +9,10 @@ class WeatherTile extends StatefulWidget {
   final Function(int) updateTile;
 
   WeatherTile(
-      {@required this.weather, this.updateFront, this.updateTile, this.index});
+      {required this.weather,
+      required this.updateFront,
+      required this.updateTile,
+      required this.index});
 
   @override
   _WeatherTileState createState() => _WeatherTileState();

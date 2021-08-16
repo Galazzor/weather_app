@@ -2,21 +2,13 @@ class Location {
   double latitude;
   double longitude;
 
-  Location({this.latitude, this.longitude});
+  Location({required this.latitude, required this.longitude});
 
-  factory Location.fromJson(Map<String, dynamic> jsonData,
-      {bool diff = false}) {
-    if (diff == false) {
-      return Location(
-        latitude: jsonData['latitude'],
-        longitude: jsonData['longitude'],
-      );
-    } else {
-      return Location(
-        latitude: jsonData['coord']['lat'],
-        longitude: jsonData['coord']['lon'],
-      );
-    }
+  factory Location.fromJson(Map<String, dynamic> jsonData) {
+    return Location(
+      latitude: jsonData['latitude'],
+      longitude: jsonData['longitude'],
+    );
   }
 
   Map<String, dynamic> toJson() => {

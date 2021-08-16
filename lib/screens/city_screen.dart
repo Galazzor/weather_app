@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:weather_app/screens/location_screen.dart';
-import 'package:weather_app/service/weather_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/providers/city_list_provider.dart';
+import 'package:weather_app/services/get_location_data.dart';
+import 'package:weather_app/services/shared_preference.dart';
 import 'package:weather_app/utilities/constants.dart';
-import 'package:weather_app/widgets/city_tile.dart';
+import 'package:weather_app/widgets/city_list.dart';
 
 class CityScreen extends StatefulWidget {
   @override
@@ -11,21 +14,28 @@ class CityScreen extends StatefulWidget {
 }
 
 class _CityScreenState extends State<CityScreen> {
-  String cityName;
-  dynamic weatherData;
+  String cityName = '';
+  bool isDisabled = false;
 
-  Future<dynamic> getLocationData(String typedCity) async {
-    var weatherService = WeatherService();
-    var locationData =
-        await weatherService.getWeatherCity(typedCity, diff: true);
-    var weatherData = await weatherService.getOneCall(locationData);
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    disableButton();
+  }
 
-    return weatherData;
+  void disableButton() {
+    setState(() {
+      if (Provider.of<CityListProvider>(context).cityCount >= 5) {
+        isDisabled = true;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -61,32 +71,48 @@ class _CityScreenState extends State<CityScreen> {
                   },
                 ),
               ),
-              FlatButton(
-                onPressed: () async {
-                  weatherData = await getLocationData(cityName);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        if (cityName != null) {
-                          return LocationScreen(
-                            typedCity: cityName,
-                            weatherData: weatherData,
-                          );
-                        } else {
-                          return LocationScreen(
-                            typedCity: cityName,
-                          );
-                        }
-                      },
+              Row(
+                children: [
+                  Expanded(
+                    child: FlatButton(
+                      onPressed: isDisabled
+                          ? null
+                          : () {
+                              if (cityName.trim().isEmpty == true) {
+                                Fluttertoast.showToast(
+                                    msg: "Please type in name of city",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor:
+                                        Colors.redAccent.withOpacity(0.9),
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                                return;
+                              }
+                              Provider.of<CityListProvider>(context,
+                                      listen: false)
+                                  .addCityBase(cityName);
+                              SharedPreference.pref(city: cityName);
+                            },
+                      child: Text(
+                        'Add Favourite',
+                        style: kButtonTextStyle,
+                      ),
                     ),
-                  );
-                },
-                child: Text(
-                  'Get Weather',
-                  style: kButtonTextStyle,
-                ),
+                  ),
+                  Expanded(
+                    child: FlatButton(
+                      onPressed: () {
+                        GetLocationData.getLocationData(context, cityName);
+                      },
+                      child: Text(
+                        'Get Weather',
+                        style: kButtonTextStyle,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: Container(
@@ -95,15 +121,9 @@ class _CityScreenState extends State<CityScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      return CityTile();
-                    },
-                    itemCount: 8,
-                  ),
+                  child: CityList(),
                 ),
-              )
+              ),
             ],
           ),
         ),
