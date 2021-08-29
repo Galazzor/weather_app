@@ -19,7 +19,8 @@ const kTextFieldInputDecoration = InputDecoration(
   ),
 );
 
-const kButtonTextStyle = TextStyle(
+final kButtonTextStyle = TextStyle(
   fontSize: 25.0,
-  fontFamily: 'Spartan MB',
+  fontWeight: FontWeight.w600,
+  color: Color(0xffF2E2BA),
 );

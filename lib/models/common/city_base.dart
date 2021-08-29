@@ -1,15 +1,20 @@
-class CityBase {
-  final String city;
+import 'package:equatable/equatable.dart';
 
-  CityBase({required this.city});
+class CityBase extends Equatable {
+  final String cityName;
+
+  CityBase({required this.cityName});
 
   factory CityBase.fromJson(Map<String, dynamic> jsonData) {
     return CityBase(
-      city: jsonData['city'],
+      cityName: jsonData['city'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'city': this.city,
+        'city': this.cityName,
       };
+
+  @override
+  List<Object?> get props => [cityName];
 }

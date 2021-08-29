@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/models/city.dart';
+import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/providers/city_list_provider.dart';
-import 'package:weather_app/screens/location_screen.dart';
+import 'package:weather_app/screens/main_screen.dart';
 import 'package:weather_app/services/web_api/weather_api_impl.dart';
 import 'package:weather_app/services/current_location_service.dart';
 
@@ -12,31 +14,62 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  static var currentCityData;
+  static var currentWeatherData;
+  static List<City> cityData = <City>[];
+  static List<List<Weather>> weatherData = <List<Weather>>[];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getLocationData();
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    Provider.of<CityListProvider>(context).loadData();
+    await Provider.of<CityListProvider>(context).loadData();
+    await getCurrentLocationData();
+    await getLocationData();
+    await showPages();
   }
 
-  void getLocationData() async {
+  Future<void> getCurrentLocationData() async {
     var location = await CurrentLocationService.get();
     var weatherService = WeatherApiImpl();
-    var cityData = await weatherService.getWeatherByLocation(location);
-    var weatherData = await weatherService.getOneCall(location);
+    currentCityData = await weatherService.getWeatherByLocation(location);
+    currentWeatherData = await weatherService.getOneCall(location);
+  }
 
-    await Future.delayed(Duration(seconds: 2));
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return LocationScreen(
-        weatherData: weatherData,
+  Future<void> getLocationData() async {
+    var weatherService = WeatherApiImpl();
+
+    for (int i = 0;
+        i < Provider.of<CityListProvider>(context, listen: false).cityCount;
+        i++) {
+      var tempLocation = await weatherService.getWeatherByCity(
+          Provider.of<CityListProvider>(context, listen: false)
+              .cityBases[i]
+              .cityName);
+      var tempCityData =
+          await weatherService.getWeatherByLocation(tempLocation.location);
+      var tempWeatherData =
+          await weatherService.getOneCall(tempLocation.location);
+
+      cityData.add(tempCityData);
+      weatherData.add(tempWeatherData);
+    }
+  }
+
+  Future<void> showPages() async {
+    await Future.delayed(Duration(seconds: 5));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return MainScreen(
+        currentCityData: currentCityData,
+        currentWeatherData: currentWeatherData,
         cityData: cityData,
+        weatherData: weatherData,
       );
     }));
   }
@@ -44,9 +77,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SpinKitDoubleBounce(
-          color: Colors.lightBlueAccent,
-          size: 100.0,
+        child: Lottie.network(
+          'https://assets3.lottiefiles.com/datafiles/5mP0vh2UJOqS1DG/data.json',
         ),
       ),
     );

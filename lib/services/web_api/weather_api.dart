@@ -17,6 +17,9 @@ abstract class WeatherApi {
     queryParameters?.putIfAbsent("appid", () => this.apiKey);
     final uri = Uri.https(this.baseUrl, "data/2.5/" + path, queryParameters);
     final response = await http.get(uri, headers: _headers);
+    if (response.statusCode != 200) {
+      throw Exception(response.reasonPhrase);
+    }
     return json.decode(response.body);
   }
 

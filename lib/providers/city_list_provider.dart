@@ -16,19 +16,20 @@ class CityListProvider extends ChangeNotifier {
     return _cityBases.length;
   }
 
-  void loadData() async {
+  Future<void> loadData() async {
     _cityBases = await _cityStorage.get();
   }
 
   void addCityBase(String city) {
-    final cityBase = CityBase(city: city);
+    final cityBase = CityBase(cityName: city);
     _cityBases.add(cityBase);
     _cityStorage.set(_cityBases);
     notifyListeners();
   }
 
-  void deleteCityBase(CityBase cityBase) {
-    _cityBases.remove(cityBase);
+  void deleteCityBase(String city) {
+    final cityBase = CityBase(cityName: city);
+    _cityBases.removeWhere((element) => element.cityName == cityBase.cityName);
     _cityStorage.set(_cityBases);
     notifyListeners();
   }

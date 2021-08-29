@@ -13,9 +13,9 @@ class CityList extends StatelessWidget {
         itemBuilder: (context, index) {
           final cityBase = cityBaseModel.cityBases[index];
           return CityTile(
-            city: cityBase.city,
+            city: cityBase.cityName,
             weatherCallback: () =>
-                GetLocationData.getLocationData(context, cityBase.city),
+                GetLocationData.getLocationData(context, cityBase.cityName),
           );
         },
         itemCount: cityBaseModel.cityCount,

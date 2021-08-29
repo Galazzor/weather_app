@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+import 'package:weather_app/services/time_calculator.dart';
 
 class Weather {
   bool isSelected = false;
@@ -7,13 +7,19 @@ class Weather {
   final String weekday;
   final String icon;
   final num precipitation;
+  final num humidity;
+  final num windSpeed;
+  final num pressure;
 
   Weather(
       {required this.temperature,
       required this.time,
       required this.weekday,
       required this.icon,
-      required this.precipitation});
+      required this.precipitation,
+      required this.humidity,
+      required this.pressure,
+      required this.windSpeed});
 
   factory Weather.fromJson(Map<String, dynamic> jsonData) {
     num temp = jsonData['temp'];
@@ -23,17 +29,10 @@ class Weather {
         temperature: temp.toInt(),
         icon: jsonData['weather'][0]['icon'],
         precipitation: tempPrep.toDouble() * 100,
-        time: calculateTimeToString(tempEpoch),
-        weekday: calculateWeekdayToString(tempEpoch));
-  }
-
-  static String calculateWeekdayToString(int epoch) {
-    DateTime temp = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-    return DateFormat('EEEE, d MMM').format(temp);
-  }
-
-  static String calculateTimeToString(int epoch) {
-    DateTime temp = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-    return DateFormat('jm').format(temp);
+        humidity: jsonData['humidity'],
+        windSpeed: jsonData['wind_speed'],
+        pressure: jsonData['pressure'],
+        time: TimeCalculator.calculateTimeToString(tempEpoch),
+        weekday: TimeCalculator.calculateWeekdayToString(tempEpoch));
   }
 }

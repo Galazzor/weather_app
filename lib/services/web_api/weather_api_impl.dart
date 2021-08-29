@@ -11,13 +11,18 @@ const openWeatherURL = 'api.openweathermap.org';
 class WeatherApiImpl extends WeatherApi {
   WeatherApiImpl() : super(openWeatherURL, apiKey);
 
-  Future<List<Weather>> getOneCall(Location location) async {
-    var weatherData = await getJson('onecall', {
-      "lat": location.latitude.toString(),
-      "lon": location.longitude.toString(),
-      "exclude": "minutely,daily",
-      "units": "metric"
-    });
+  Future<List<Weather>> getOneCall(Location? location) async {
+    var weatherData;
+    try {
+      weatherData = await getJson('onecall', {
+        "lat": location!.latitude.toString(),
+        "lon": location.longitude.toString(),
+        "exclude": "minutely,daily",
+        "units": "metric"
+      });
+    } catch (e) {
+      print('Wrong Location');
+    }
 
     List<Weather> weathers = <Weather>[];
 
@@ -29,17 +34,27 @@ class WeatherApiImpl extends WeatherApi {
   }
 
   Future<City> getWeatherByLocation(Location location) async {
-    var cityData = await getJson('weather', {
-      "lat": location.latitude.toString(),
-      "lon": location.longitude.toString(),
-      "units": "metric"
-    });
+    var cityData;
+    try {
+      cityData = await getJson('weather', {
+        "lat": location.latitude.toString(),
+        "lon": location.longitude.toString(),
+        "units": "metric"
+      });
+    } catch (e) {
+      print('Wrong Location');
+    }
 
     return City.fromJson(cityData);
   }
 
   Future<City> getWeatherByCity(String city) async {
-    var cityData = await getJson('weather', {"q": city, "units": "metric"});
+    var cityData;
+    try {
+      cityData = await getJson('weather', {"q": city, "units": "metric"});
+    } catch (e) {
+      throw e;
+    }
     return City.fromJson(cityData);
   }
 }

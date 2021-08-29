@@ -17,6 +17,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
+          dividerTheme: DividerThemeData(
+            space: 10,
+            color: Colors.grey,
+            thickness: 1,
+          ),
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
